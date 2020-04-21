@@ -387,7 +387,7 @@ class processvid_menu:
 
         # remove process txt file if process were killed half way
         try:
-            os.remove(self.outputdir + '\\' + 'process_video_define.txt')
+            os.remove(self.outputdir + '/' + 'process_video_define.txt')
         except:
             print('Executing...')
 
@@ -416,15 +416,15 @@ class processvid_menu:
         ## copy video and move it to output dir
         copyvideos = []
         for i in self.filesFound:
-            command = 'copy \"' + str(self.videofolder) + '\\' + str(
-                os.path.basename(i)) + '\" \"' + self.outputdir + '\"'
+            command = 'copy /"' + str(self.videofolder) + '/' + str(
+                os.path.basename(i)) + '/""' + self.outputdir + '/"'
             copyvideos.append(command)
 
         #compiling all the commands into list
         all_list = copyvideos + crop + shorten + downsample + grayscale + superimpose
         print(len(all_list))
         #creating text file
-        filepath = self.outputdir + '\\' + 'process_video_define.txt'
+        filepath = self.outputdir + '/' + 'process_video_define.txt'
 
         if os.path.exists(filepath):
             append_write = 'a'  # append if already exists
@@ -443,13 +443,13 @@ class processvid_menu:
         ##clahe
         for i in range(len(self.filesFound)):
             if self.row[i].get_clahe() == 1:
-                clahe_queue(self.outputdir +'\\'+ os.path.basename(self.filesFound[i]))
+                clahe_queue(self.outputdir +'/'+ os.path.basename(self.filesFound[i]))
             else:
                 print('Clahe not applied to',str(self.filesFound[i]))
         ##rename the txt file ran
-        file = os.path.dirname(filepath) + '\\' + 'Processes_ran.txt'
+        file = os.path.dirname(filepath) + '/' + 'Processes_ran.txt'
         os.rename(filepath, file)
-        dir = str(self.outputdir + '\\' + 'process_archive')
+        dir = str(self.outputdir + '/' + 'process_archive')
         try:
             os.makedirs(dir)
             print("Directory", dir, "created ")
@@ -873,11 +873,11 @@ class video_info_table:
     def __init__(self,configini):
 
         self.filesFound = [0]  #initiate files found
-        video_info_csv = str(os.path.dirname(configini)+'\\logs\\video_info.csv')
+        video_info_csv = str(os.path.dirname(configini)+'/logs/video_info.csv')
         config = ConfigParser()
         self.configFile = str(configini)
         config.read(self.configFile)
-        self.config_videofolders = str(config.get('General settings', 'project_path'))+'\\videos'
+        self.config_videofolders = str(config.get('General settings', 'project_path'))+'/videos'
         config_distancemm = config.get('Frame settings', 'distance_mm')
 
         ########### FIND FILES ###########
@@ -945,7 +945,7 @@ class video_info_table:
             self.data_lists.append([])
 
         for i in self.filesFound:
-            self.data_lists[1].append(str(self.config_videofolders +'\\'+ str(i)))
+            self.data_lists[1].append(str(self.config_videofolders +'/'+ str(i)))
             self.data_lists[5].append(int(0))
 
         if os.path.exists(video_info_csv):
@@ -1013,7 +1013,7 @@ class video_info_table:
                 self.data_lists[i].append(self.table_col[i].entry_get(j))
 
         # add path to videos for get coord
-        self.data_lists[1] = [str(self.config_videofolders)+'\\'+s for s in self.data_lists[1]]
+        self.data_lists[1] = [str(self.config_videofolders)+'/'+s for s in self.data_lists[1]]
         if self.pixel_list!= None:
             self.button = Button_getcoord(self.xscrollbar, self.data_lists[1], self.data_lists[5],self.pixel_list)
             self.button.grid(row=6, column=1)
@@ -1051,7 +1051,7 @@ class video_info_table:
         df=df.drop(['index'],axis=1)
         df=df.drop(['level_0'],axis=1)
 
-        logfolder=str(os.path.dirname(self.configFile))+'\\logs\\'
+        logfolder=str(os.path.dirname(self.configFile))+'/logs/'
         csv_filename = 'video_info.csv'
         output=logfolder+csv_filename
         print(df)
@@ -1294,7 +1294,7 @@ class create_project_DLC:
 
                 for i in os.listdir(self.videopath1selected.folder_path):
                     if ('.avi' or '.mp4') in i:
-                        i = self.videopath1selected.folder_path + '\\' + i
+                        i = self.videopath1selected.folder_path + '/' + i
                         videolist.append(i)
             except:
                 print('Please select a video folder to import videos')
@@ -2817,7 +2817,7 @@ class project_config:
         noofbp = int(self.noOfBp.entry_get)
         self.bpnamelist = [0]*noofbp
 
-        frame = LabelFrame(master,text='Bodyparts\' name')
+        frame = LabelFrame(master,text='Bodyparts/' name')
 
         frame.grid(row=5,sticky=W)
 
@@ -2936,7 +2936,7 @@ class project_config:
 
     def extract_frames(self):
         try:
-            videopath = str(os.path.dirname(self.configinifile) + '\\videos')
+            videopath = str(os.path.dirname(self.configinifile) + '/videos')
 
             extract_frames_ini(videopath)
         except:
@@ -3517,7 +3517,7 @@ class loadprojectini:
 
     def loaddefinedroi(self):
 
-        h5dir = os.path.dirname(self.projectconfigini) + '\\logs\\measures'
+        h5dir = os.path.dirname(self.projectconfigini) + '/logs/measures'
         h5list = os.listdir(h5dir)
         result = [i for i in h5list if '.h5' in i]
         if result == []:
@@ -3955,7 +3955,7 @@ class loadprojectini:
 
     def extract_frames_loadini(self):
         configini = self.projectconfigini
-        videopath = str(os.path.dirname(configini) + '\\videos')
+        videopath = str(os.path.dirname(configini) + '/videos')
 
         extract_frames_ini(videopath)
 
@@ -4272,7 +4272,7 @@ class trainmachinemodel_settings:
     def save_new(self):
         self.get_checkbox()
         meta_number = 0
-        for f in os.listdir(os.path.dirname(self.configini)+'\\configs\\'):
+        for f in os.listdir(os.path.dirname(self.configini)+'/configs/'):
             if f.__contains__('_meta') and f.__contains__(str(self.varmodel.get())):
                 meta_number += 1
 
@@ -4293,7 +4293,7 @@ class trainmachinemodel_settings:
         meta_df = pd.DataFrame(new_meta_dict, index=[0])
         meta_df.insert(0, 'Classifier_name', str(self.varmodel.get()))
 
-        output_path = os.path.dirname(self.configini) + "\\configs\\" + \
+        output_path = os.path.dirname(self.configini) + "/configs/" + \
                       str(self.varmodel.get())+ '_meta_' + str(meta_number) + '.csv'
         print(os.path.basename(str(output_path)),'saved')
 
@@ -4608,7 +4608,7 @@ class SplashScreen:
         self.Window()
 
     def Splash(self):
-        self.image = Image.open(r".\TheGoldenLab.png")
+        self.image = Image.open(r"./TheGoldenLab.png")
         self.imgSplash = ImageTk.PhotoImage(self.image)
 
     def Window(self):
