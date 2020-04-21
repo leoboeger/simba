@@ -2817,7 +2817,7 @@ class project_config:
         noofbp = int(self.noOfBp.entry_get)
         self.bpnamelist = [0]*noofbp
 
-        frame = LabelFrame(master,text='Bodyparts/' name')
+        frame = LabelFrame(master,text='Bodyparts\' name')
 
         frame.grid(row=5,sticky=W)
 
@@ -4608,7 +4608,7 @@ class SplashScreen:
         self.Window()
 
     def Splash(self):
-        self.image = Image.open(r"./TheGoldenLab.png")
+        self.image = PIL.Image.open(r"./TheGoldenLab.png")
         self.imgSplash = ImageTk.PhotoImage(self.image)
 
     def Window(self):
