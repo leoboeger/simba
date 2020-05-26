@@ -11,7 +11,36 @@ You can choose to install SimBA as a standalone package or install SimBA with [T
 2. [Git](https://git-scm.com/downloads) 
 3. [FFmpeg](https://m.wikihow.com/Install-FFmpeg-on-Windows)
 
-# Installing SimBA 
+# Installing SimBA Option 1
+
+### Install SimBAxTF with integrated TensorFlow (use this installation method when running DeepLabCut or DeepPoseKit locally using a GPU)
+Open bash or command prompt and run the following commands on current working directory
+
+```
+pip install simba-uw-tf
+```
+
+### Install SimBA standalone package (without TensorFlow or integrated DeepLabCut/DeepPoseKit support)
+Open bash or command prompt and run the following commands on current working directory
+
+```
+pip install simba-uw-no-tf
+```
+
+# How to launch SimBA ( installed using pip install simba-uw-tf)
+
+1. Open up command prompt anywhere.
+
+2. In the command prompt type
+```
+simba
+```
+3. Hit `Enter`.
+
+>*Note:* If you installed simba on a virtual environment (anaconda), after installation, run `conda install shapely` for simba to work.
+
+
+# Installing SimBA Option 2
 
 ### Install SimBAxTF with integrated TensorFlow (use this installation method when running DeepLabCut or DeepPoseKit locally using a GPU)
 Open bash or command prompt and run the following commands on current working directory
@@ -31,7 +60,7 @@ git clone -b SimBA_no_TF https://github.com/sgoldenlab/simba.git
 pip3 install -r simba/SimBA/requirements.txt
 ```
 
-# How to launch SimBA
+# How to launch SimBA (installing by cloning)
 
 1. Open up command prompt in the SimBA folder
 
@@ -57,7 +86,7 @@ python SimBA.py
 | [deepposekit](https://github.com/jgraving/DeepPoseKit) | 0.3.5 |
 | [dtreeviz](https://github.com/parrt/dtreeviz)   | 0.8.1  |
 | [opencv_python](https://github.com/skvark/opencv-python)| 3.4.5.20 |
-| [numpy](https://github.com/numpy/numpy)|0.18.1 |
+| [numpy](https://github.com/numpy/numpy)|1.18.1 |
 | [imgaug](https://imgaug.readthedocs.io/en/latest/)| 0.4.0 |
 | [pandas](https://github.com/pandas-dev/pandas)| 0.25.3 |
 | [scikit_image](https://scikit-image.org/)| 0.14.2  |
@@ -71,3 +100,6 @@ python SimBA.py
 | [yellowbrick](https://github.com/DistrictDataLabs/yellowbrick)| 0.9.1 |
 | [xgboost](https://github.com/dmlc/xgboost)| 0.9 |
 | [tabulate](https://bitbucket.org/astanin/python-tabulate/src/master/)| 0.8.3 |
+| [tables](https://www.pytables.org/)| ≥ 3.5.1 |
+
+

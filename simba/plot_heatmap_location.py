@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 from drop_bp_cords import getBpHeaders
 
-def plotHeatMap(inifile, animalbp1, mmSize, noIncrements, secIncrements, colorPalette, lastImageOnlyBol, targetBehav):
+def plotHeatMapLocation(inifile, animalbp1, mmSize, noIncrements, secIncrements, colorPalette, lastImageOnlyBol):
     config = ConfigParser()
     configFile = str(inifile)
     try:
@@ -90,10 +90,9 @@ def plotHeatMap(inifile, animalbp1, mmSize, noIncrements, secIncrements, colorPa
                 im_scale_bar = im_scale_bar[0:height, 0:newWidth]
         print('Calculating heatmap from file: ' + str(currVidBaseName) + '...')
         for index, row in currDf.iterrows():
-            if row[targetBehav] == 1:
-                cordX, cordY = (row[trackedBodyParts[0]], row[trackedBodyParts[1]])
-                binX, binY = (int((cordX * NbinsX) / width), int((cordY * NbinsY) / height))
-                targetCountArrayFrames[binY, binX] = targetCountArrayFrames[binY, binX] + 1
+            cordX, cordY = (row[trackedBodyParts[0]], row[trackedBodyParts[1]])
+            binX, binY = (int((cordX * NbinsX) / width), int((cordY * NbinsY) / height))
+            targetCountArrayFrames[binY, binX] = targetCountArrayFrames[binY, binX] + 1
             targetCountArray = ((targetCountArrayFrames / fps) - 0.1) / secIncrements
             targetCountArray[targetCountArray < 0] = 0
             if lastImageOnlyBol == 1:

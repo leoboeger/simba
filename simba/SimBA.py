@@ -12,6 +12,7 @@ from tkinter import *
 from tkinter.filedialog import askopenfilename,askdirectory
 from tkinter_functions import *
 from create_project_ini import write_inifile
+from json2csv import json2csv_file, json2csv_folder
 from tkinter import tix
 import subprocess
 import platform
@@ -32,7 +33,7 @@ from merge_movie_ffmpeg import generatevideo_config_ffmpeg
 from import_videos_csv_project_ini import *
 from configparser import ConfigParser
 from labelling_aggression import *
-from pseudoLabel import semisuperviseLabel
+# from pseudoLabel import semisuperviseLabel
 from load_labelling_aggression import load_folder
 from PIL import Image, ImageTk
 import tkinter.ttk as ttk
@@ -57,7 +58,7 @@ from ROI_multiply import *
 from ROI_reset import *
 from ROI_add_to_features import *
 from ROI_process_movement import *
-from ROI_visualize_features import ROItoFeatures
+from ROI_visualize_features import ROItoFeaturesViz
 from plot_heatmap import plotHeatMap
 import warnings
 from outlier_scripts.movement.correct_devs_mov_16bp import dev_move_16
@@ -95,7 +96,9 @@ from dpk_script.Visualize_video import visualizeDPK
 from reset_poseConfig import reset_DiagramSettings
 from plot_threshold import plot_threshold
 from merge_frames_movie import mergeframesPlot
+from plot_heatmap_location import plotHeatMapLocation
 import threading
+import datetime
 
 simBA_version = 1.1
 
@@ -156,7 +159,6 @@ class roitableMenu:
             self.row[i].grid(row=i + 1, sticky=W)
 
         tableframe.grid(row=0)
-
 
 class processvid_title(Frame):
     def __init__(self,parent=None,widths="",color=None,shortenbox =None,downsambox =None,graybox=None,framebox=None,clahebox=None,**kw):
@@ -278,6 +280,41 @@ class processvid_menu:
         scroll =  Canvas(hxtScrollbar(vidprocessmenu))
         scroll.pack(fill="both",expand=True)
 
+        #shortcut for filling up parameters
+        shortcutframe = LabelFrame(scroll,text='Quick settings',pady=5,padx=5)
+        #shorten
+        shortenshortcut = LabelFrame(shortcutframe,text='Shorten settings',padx=5)
+        starttime = Entry_Box(shortenshortcut,'Start time','15')
+        endtime = Entry_Box(shortenshortcut,'End time','15')
+        shortenbutton = Button(shortenshortcut,text='Save settings',command=lambda:self.saveShortensettings(starttime.entry_get,endtime.entry_get))
+        #add sec
+        secondshortcut = LabelFrame(shortcutframe,text='Add seconds to start time',padx=5)
+        secondstoadd = Entry_Box(secondshortcut,'seconds','15')
+        addsecbutton = Button(secondshortcut,text='Add seconds',command=lambda:self.addsec(secondstoadd.entry_get))
+
+        #downsample
+        downsampleshortcut = LabelFrame(shortcutframe,text='Downsample settings',padx=5)
+        width = Entry_Box(downsampleshortcut,'Width','15')
+        height = Entry_Box(downsampleshortcut,'Height','15')
+        downsamplebutton = Button(downsampleshortcut,text='Save settings',command=lambda:self.saveDownsamplesettings(width.entry_get,height.entry_get))
+
+        #organize
+        shortenshortcut.grid(row=0,sticky=W,padx=10)
+        starttime.grid(row=0,sticky=W)
+        endtime.grid(row=1,sticky=W)
+        shortenbutton.grid(row=2,sticky=W)
+
+        secondshortcut.grid(row=1,sticky=W,padx=10)
+        secondstoadd.grid(row=0,sticky=W)
+        addsecbutton.grid(row=1,sticky=W)
+
+        downsampleshortcut.grid(row=0,column=1,sticky=W)
+        width.grid(row=0,sticky=W)
+        height.grid(row=1,sticky=W)
+        downsamplebutton.grid(row=2,sticky=W)
+
+
+        ## starting of the real table
         tableframe = LabelFrame(scroll)
 
         # table title
@@ -295,8 +332,49 @@ class processvid_menu:
         #button to trigger process video
         but = Button(scroll,text='Execute',command = lambda: threading.Thread(target=self.execute_processvideo).start(),font=('Times',12,'bold'),fg='navy')
         but.grid(row=2)
+
         #organize
-        tableframe.grid(row=1)
+        shortcutframe.grid(row=0,sticky=W)
+        tableframe.grid(row=1,sticky=W,)
+
+    def addsec(self,secondToAdd):
+        outtimelist = []
+        # loop through and get final time
+        for i in range(len(self.filesFound)):
+            starttime = self.row[i].trimstart.get() #get the user's input
+            starttimelist = starttime.split(':') # split it into hours: minutes : seconds
+            for i in range(len(starttimelist)): # remove the 0 so it is compatible with the datetimeformat
+                if starttimelist[i][0] == '0':
+                    starttimelist[i] = starttimelist[i][1:]
+
+            hr,min,sec = starttimelist #get inputs for datetime
+            starttime = datetime.time(int(hr),int(min),int(sec))
+            out_time = str(self.addSecs(starttime,int(secondToAdd))) #call addSecs func: starttime + secondToAdd = out_time
+            outtimelist.append(out_time)
+
+        # add the final time into the table
+        for i in range(len(self.filesFound)):
+            self.row[i].trimend.delete(0, END)
+            self.row[i].trimend.insert(0,outtimelist[i])
+
+    def addSecs(self,tm, secs):
+        fulldate = datetime.datetime(100, 1, 1, tm.hour, tm.minute, tm.second)
+        fulldate = fulldate + datetime.timedelta(seconds=secs)
+        return fulldate.time()
+
+    def saveDownsamplesettings(self,width,height):
+        for i in range(len(self.filesFound)):
+            self.row[i].width.delete(0, END)
+            self.row[i].height.delete(0, END)
+            self.row[i].width.insert(0,width)
+            self.row[i].height.insert(0,height)
+
+    def saveShortensettings(self,startime,endtime):
+        for i in range(len(self.filesFound)):
+            self.row[i].trimstart.delete(0, END)
+            self.row[i].trimend.delete(0, END)
+            self.row[i].trimstart.insert(0,startime)
+            self.row[i].trimend.insert(0,endtime)
 
 
     def selectall_clahe(self):
@@ -475,7 +553,6 @@ class batch_processvideo: ##pre process video first menu (ask for input and outp
         batchprocess.minsize(400, 200)
         batchprocess.wm_title("Batch process video")
 
-
         #Video Selection Tab
         label_videoselection = LabelFrame(batchprocess,text='Folder selection',font='bold',padx=5,pady=5)
         self.folder1Select = FolderSelect(label_videoselection,'Video directory:',title='Select Folder with videos')
@@ -502,7 +579,6 @@ class batch_processvideo: ##pre process video first menu (ask for input and outp
             print('Please select a folder with videos')
         else:
             print('Please select folder with videos and the output directory')
-
 
 class outlier_settings:
     def __init__(self,configini):
@@ -698,20 +774,18 @@ class FolderSelect(Frame):
         return self.folderPath.get()
 
 class DropDownMenu(Frame):
-    def __init__(self,parent=None,dropdownLabel='',choice_dict=None,labelwidth='',**kw):
+    def __init__(self,parent=None,dropdownLabel='',choice_dict=None,labelwidth='',com=None,**kw):
         Frame.__init__(self,master=parent,**kw)
         self.dropdownvar = StringVar()
         self.lblName = Label(self,text=dropdownLabel,width=labelwidth,anchor=W)
         self.lblName.grid(row=0,column=0)
         self.choices = choice_dict
-        self.popupMenu = OptionMenu(self,self.dropdownvar,*self.choices)
+        self.popupMenu = OptionMenu(self,self.dropdownvar,*self.choices,command=com)
         self.popupMenu.grid(row=0,column=1)
     def getChoices(self):
         return self.dropdownvar.get()
     def setChoices(self,choice):
         self.dropdownvar.set(choice)
-
-
 
 class FileSelect(Frame):
     def __init__(self,parent=None,fileDescription="",color=None,title=None,lblwidth=None,**kw):
@@ -741,6 +815,7 @@ class FileSelect(Frame):
 class Entry_Box(Frame):
     def __init__(self,parent=None,fileDescription="",labelwidth='',status = None,**kw):
         self.status = status if status is not None else NORMAL
+        self.labelname = fileDescription
         Frame.__init__(self,master=parent,**kw)
         self.filePath = StringVar()
         self.lblName = Label(self, text=fileDescription,width=labelwidth,anchor=W)
@@ -784,6 +859,7 @@ class Button_getcoord(Frame):
         self.entPath = []
         self.ppm_list = []
         self.ppmvar = []
+        self.filename = filename
         labelgetcoord =Label(self,text='Get coord')
         labelgetcoord.grid(row=0,pady=6)
 
@@ -813,6 +889,10 @@ class Button_getcoord(Frame):
     def getppm(self,count):
         ppms = self.ppm_list[count].get()
         return ppms
+
+    def set_allppm(self,value):
+        for i in range(len(self.filename) - 1):
+            self.ppmvar[i].set(value)
 
 def Exit():
     app.root.destroy()
@@ -996,6 +1076,9 @@ class video_info_table:
         generate_csv_button = Button(self.xscrollbar,text='Save Data',command=self.generate_video_info_csv,font='bold',fg='red')
         generate_csv_button.grid(row=5)
 
+        setppmbutton = Button(self.xscrollbar,text='Duplicate index 1 pixel/mm (CAUTION!)',command= self.setAll_ppm, fg='red')
+        setppmbutton.grid(row =5,column=1)
+
 
     def addBox(self):
         self.new_col_list.append(0)
@@ -1066,6 +1149,11 @@ class video_info_table:
 
         df.to_csv(str(output),index=False)
         print(os.path.dirname(output),'generated.')
+
+    def setAll_ppm(self):
+        firstvalue = self.button.getppm(0)
+        self.button.set_allppm(firstvalue)
+
 
 class video_downsample:
 
@@ -2691,13 +2779,16 @@ class project_config:
 
 
         #import all csv file into project folder
-        label_import_csv = LabelFrame(tab3,text='Import DLC Tracking Data',fg='black',font=("Helvetica",12,'bold'),pady=5,padx=5)
+        self.label_import_csv = LabelFrame(tab3,text='Import Tracking Data',fg='black',font=("Helvetica",12,'bold'),pady=5,padx=5)
+        self.filetype = DropDownMenu(self.label_import_csv,'File type',['csv','json'],'12',com=self.fileselected)
+        self.filetype.setChoices('csv')
+
         #multicsv
-        label_multicsvimport = LabelFrame(label_import_csv, text='Import multiple csv files', pady=5, padx=5)
+        label_multicsvimport = LabelFrame(self.label_import_csv, text='Import multiple csv files', pady=5, padx=5)
         self.folder_csv = FolderSelect(label_multicsvimport,'Folder Select:',title='Select Folder with .csv(s)')
         button_import_csv = Button(label_multicsvimport,text='Import csv to project folder',command = self.import_multicsv,fg='navy')
         #singlecsv
-        label_singlecsvimport = LabelFrame(label_import_csv, text='Import single csv files', pady=5, padx=5)
+        label_singlecsvimport = LabelFrame(self.label_import_csv, text='Import single csv file', pady=5, padx=5)
         self.file_csv = FileSelect(label_singlecsvimport,'File Select',title='Select a .csv file')
         button_importsinglecsv = Button(label_singlecsvimport,text='Import single csv to project folder',command=self.import_singlecsv,fg='navy')
 
@@ -2735,21 +2826,62 @@ class project_config:
         self.singlevideopath.grid(row=0,sticky=W)
         button_importsinglevideo.grid(row=1,sticky=W)
 
-
-        label_import_csv.grid(row=5,sticky=W,pady=5)
-        label_multicsvimport.grid(row=0,sticky=W)
+        self.label_import_csv.grid(row=5,sticky=W,pady=5)
+        self.filetype.grid(row=0,sticky=W)
+        label_multicsvimport.grid(row=1,sticky=W)
         self.folder_csv.grid(row=0,sticky=W)
         button_import_csv.grid(row=1,sticky=W)
-        label_singlecsvimport.grid(row=1,sticky=W)
+        label_singlecsvimport.grid(row=2,sticky=W)
         self.file_csv.grid(row=0,sticky=W)
         button_importsinglecsv.grid(row=1,sticky=W)
 
-
-        label_extractframes.grid(row=6,sticky=W)
+        label_extractframes.grid(row=7,sticky=W)
         label_note.grid(row=0,sticky=W)
         label_caution.grid(row=1,sticky=W)
         label_caution2.grid(row=2,sticky=W)
         button_extractframes.grid(row=3,sticky=W)
+
+    def fileselected(self,val):
+
+        if self.filetype.getChoices()=='csv':
+            # multicsv
+            label_multicsvimport = LabelFrame(self.label_import_csv, text='Import multiple csv files', pady=5, padx=5)
+            self.folder_csv = FolderSelect(label_multicsvimport, 'Folder Select:', title='Select Folder with .csv(s)')
+            button_import_csv = Button(label_multicsvimport, text='Import csv to project folder',
+                                       command=self.import_multicsv, fg='navy')
+            # singlecsv
+            label_singlecsvimport = LabelFrame(self.label_import_csv, text='Import single csv file', pady=5, padx=5)
+            self.file_csv = FileSelect(label_singlecsvimport, 'File Select', title='Select a .csv file')
+            button_importsinglecsv = Button(label_singlecsvimport, text='Import single csv to project folder',
+                                            command=self.import_singlecsv, fg='navy')
+            label_multicsvimport.grid(row=1, sticky=W)
+            self.folder_csv.grid(row=0, sticky=W)
+            button_import_csv.grid(row=1, sticky=W)
+            label_singlecsvimport.grid(row=2, sticky=W)
+            self.file_csv.grid(row=0, sticky=W)
+            button_importsinglecsv.grid(row=1, sticky=W)
+        else:
+            # multijson
+            label_multijsonimport = LabelFrame(self.label_import_csv, text='Import multiple json files', pady=5, padx=5)
+            self.folder_json = FolderSelect(label_multijsonimport, 'Folder Select:',
+                                            title='Select Folder with .json(s)')
+            button_import_json = Button(label_multijsonimport, text='Import json to project folder',
+                                        command=lambda: json2csv_folder(self.configinifile,
+                                                                        self.folder_json.folder_path), fg='navy')
+            # singlecsv
+            label_singlejsonimport = LabelFrame(self.label_import_csv, text='Import single json file', pady=5, padx=5)
+            self.file_json = FileSelect(label_singlejsonimport, 'File Select', title='Select a .csv file')
+            button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder',
+                                             command=lambda: json2csv_file(self.configinifile, self.file_json.file_path),
+                                             fg='navy')
+            # import json into projectfolder
+
+            label_multijsonimport.grid(row=1, sticky=W)
+            self.folder_json.grid(row=0, sticky=W)
+            button_import_json.grid(row=1, sticky=W)
+            label_singlejsonimport.grid(row=2, sticky=W)
+            self.file_json.grid(row=0, sticky=W)
+            button_importsinglejson.grid(row=1, sticky=W)
 
     def resetSettings(self):
         popup = Tk()
@@ -3022,15 +3154,18 @@ class loadprojectini:
         label_import = LabelFrame(tab2)
 
         #import all csv file into project folder
-        label_import_csv = LabelFrame(label_import, text='Import further DLC tracking data', font=("Helvetica",12,'bold'), pady=5, padx=5,fg='black')
+        self.label_import_csv = LabelFrame(label_import, text='Import further tracking data', font=("Helvetica",12,'bold'), pady=5, padx=5,fg='black')
+        filetype = DropDownMenu(self.label_import_csv,'File type',['csv','json'],'15',com=self.fileselected)
+        filetype.setChoices('csv')
         # multicsv
-        label_multicsvimport = LabelFrame(label_import_csv, text='Import multiple csv files', pady=5, padx=5)
+        label_multicsvimport = LabelFrame(self.label_import_csv, text='Import multiple csv files', pady=5, padx=5)
         self.folder_csv = FolderSelect(label_multicsvimport, 'Folder selected:',title='Select Folder with .csv(s)')
         button_import_csv = Button(label_multicsvimport, text='Import csv to project folder',command= self.importdlctracking_multi,fg='navy')
         # singlecsv
-        label_singlecsvimport = LabelFrame(label_import_csv, text='Import single csv files', pady=5, padx=5)
+        label_singlecsvimport = LabelFrame(self.label_import_csv, text='Import single csv files', pady=5, padx=5)
         self.file_csv = FileSelect(label_singlecsvimport, 'File selected',title='Select a .csv file')
         button_importsinglecsv = Button(label_singlecsvimport, text='Import single csv to project folder',command= self.importdlctracking_single,fg='navy')
+
 
         #import videos
         label_importvideo = LabelFrame(label_import, text='Import further videos into project folder', font=("Helvetica",12,'bold'), padx=15,pady=5,fg='black')
@@ -3061,6 +3196,11 @@ class loadprojectini:
         #remove classifier
         label_removeclassifier = LabelFrame(label_import,text='Remove exisiting classifier(s)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
         button_removeclassifier = Button(label_removeclassifier,text='Choose a classifier to remove',command=self.removeclassifiermenu)
+
+        ## archive all csvs
+        label_archivecsv =  LabelFrame(label_import,text='Archive processed files', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
+        archiveentrybox = Entry_Box(label_archivecsv,'Archive folder name', '16')
+        button_archivecsv = Button(label_archivecsv,text='Archive',command = lambda: archive_all_csvs(self.projectconfigini,archiveentrybox.entry_get))
 
         #get coordinates
         label_setscale = LabelFrame(tab3,text='Video parameters (fps, resolution, ppx/mm, etc.)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
@@ -3106,7 +3246,7 @@ class loadprojectini:
         self.roi_draw1 = LabelFrame(tab6, text='Visualize ROI')
         # button
         visualizeROI = Button(self.roi_draw1, text='Visualize ROI tracking', command=lambda: roiPlot(self.projectconfigini))
-        visualizeROIfeature = Button(self.roi_draw1, text='Visualize ROI features', command=lambda: ROItoFeatures(self.projectconfigini))
+        visualizeROIfeature = Button(self.roi_draw1, text='Visualize ROI features', command=lambda: ROItoFeaturesViz(self.projectconfigini))
         ##organize
         self.roi_draw1.grid(row=0, column=3, sticky=N)
         visualizeROI.grid(row=0)
@@ -3117,9 +3257,13 @@ class loadprojectini:
         button_process_movement1 = Button(processmovementdupLabel, text='Analyze distances/velocity',
                                          command=lambda: self.roi_settings('Analyze distances/velocity',
                                                                            'processmovement'))
+        self.hmlvar = IntVar()
+        self.hmlvar.set(1)
+        button_hmlocation = Button(processmovementdupLabel,text='Create heat maps',command=lambda:self.run_roiAnalysisSettings(Toplevel(),self.hmlvar,'locationheatmap'))
         #organize
         processmovementdupLabel.grid(row=0,column=4,sticky=N)
         button_process_movement1.grid(row=0)
+        button_hmlocation.grid(row=1)
 
 
         #outlier correction
@@ -3143,12 +3287,17 @@ class loadprojectini:
         button_labelaggression = Button(label_labelaggression, text='Select folder with frames (create new video annotation)',command= lambda:choose_folder(self.projectconfigini))
         button_load_labelaggression = Button(label_labelaggression,text='Select folder with frames (continue existing video annotation)',command= lambda: load_folder(self.projectconfigini))
 
-        #pseudolabel
-        label_pseudo = LabelFrame(tab7,text='Pseudo Labelling',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
-        pLabel_framedir = FolderSelect(label_pseudo,'Frame folder',lblwidth='15')
-        pLabel_dropdown = DropDownMenu(label_pseudo,'Target',targetlist,'15')
-        pLabel_dropdown.setChoices(list(targetlist)[0])
-        pLabel_button = Button(label_pseudo,text='Correct label',command = lambda:semisuperviseLabel(self.projectconfigini,pLabel_framedir.folder_path,pLabel_dropdown.getChoices()))
+        # #pseudolabel
+        # label_pseudo = LabelFrame(tab7,text='Pseudo Labelling',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
+        # pLabel_framedir = FolderSelect(label_pseudo,'Frame folder',lblwidth='10')
+        # plabelframe_threshold = LabelFrame(label_pseudo,text='Threshold',pady=5,padx=5)
+        # plabel_threshold =[0]*len(targetlist)
+        # count=0
+        # for i in list(targetlist):
+        #     plabel_threshold[count] = Entry_Box(plabelframe_threshold,str(i),'10')
+        #     plabel_threshold[count].grid(row=count+2,sticky=W)
+        #     count+=1
+        # pLabel_button = Button(label_pseudo,text='Correct label',command = lambda:semisuperviseLabel(self.projectconfigini,pLabel_framedir.folder_path,list(targetlist),plabel_threshold))
 
 
         #train machine model
@@ -3184,7 +3333,8 @@ class loadprojectini:
         # machine results
         label_machineresults = LabelFrame(tab9,text='Analyze Machine Results',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         button_process_datalog = Button(label_machineresults,text='Analyze machine predictions',command =self.analyzedatalog)
-        button_process_movement = Button(label_machineresults,text='Analyze distances/velocity',command=lambda:self.roi_settings('Analyze distances/velocity','processmovement'))
+        button_process_movement = Button(label_machineresults,text='Analyze distances/velocity',command=lambda:self.roi_settings('Analyze distances/velocity',
+                                                                           'processmovement'))
         label_severity = LabelFrame(tab9,text='Analyze Severity',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         self.severityscale = Entry_Box(label_severity,'Severity scale 0 -',15)
         self.severityTarget = DropDownMenu(label_severity,'Target',targetlist,'15')
@@ -3238,9 +3388,9 @@ class loadprojectini:
 
         #Heatplot
         label_heatmap = LabelFrame(label_plotall, text='Heatmap', pady=5, padx=5)
-        self.BinSize = Entry_Box(label_heatmap, 'Bin size (px)', '15')
-        self.MaxScale = Entry_Box(label_heatmap, '# Scale increments', '15')
-        self.Inc = Entry_Box(label_heatmap, 'Scale increment (s)', '15')
+        self.BinSize = Entry_Box(label_heatmap, 'Bin size (mm)', '15')
+        self.MaxScale = Entry_Box(label_heatmap, '# increments', '15')
+        self.Inc = Entry_Box(label_heatmap, 'Seconds per increment', '15')
 
         hmchoices = {'viridis','plasma','inferno','magma','jet','gnuplot2'}
         self.hmMenu = DropDownMenu(label_heatmap,'Color Palette',hmchoices,'15')
@@ -3248,7 +3398,13 @@ class loadprojectini:
         #get target called on top
         self.targetMenu = DropDownMenu(label_heatmap,'Target',targetlist,'15')
         self.targetMenu.setChoices(targetlist[(config.get('SML settings','target_name_'+str(1)))])
-
+        #bodyparts
+        bp1, bp2 = define_bp_drop_down(configini)
+        bpoptions = bp1 + bp2
+        self.bp1 = DropDownMenu(label_heatmap,'Bodypart',bpoptions,'15')
+        self.bp1.setChoices(bpoptions[0])
+        self.intimgvar = IntVar()
+        lstimg = Checkbutton(label_heatmap,text='Save last image only (if unticked heatmap videos are created)',variable=self.intimgvar)
         button_heatmap = Button(label_heatmap, text='Generate heatmap', command=self.heatmapcommand)
 
         #plot threshold
@@ -3284,15 +3440,16 @@ class loadprojectini:
 
         #organize
         label_import.grid(row=0,column=0,sticky=W,pady=5)
-        label_import_csv.grid(row=0, sticky=N+W, pady=5)
-        label_multicsvimport.grid(row=0, sticky=W)
+        self.label_import_csv.grid(row=0, sticky=N + W, pady=5)
+        filetype.grid(row=0,sticky=W)
+        label_multicsvimport.grid(row=1, sticky=W)
         self.folder_csv.grid(row=0, sticky=W)
         button_import_csv.grid(row=1, sticky=W)
-        label_singlecsvimport.grid(row=1, sticky=W)
+        label_singlecsvimport.grid(row=2, sticky=W)
         self.file_csv.grid(row=0, sticky=W)
         button_importsinglecsv.grid(row=1, sticky=W)
 
-        label_importvideo.grid(row=1,column=0, sticky=N+W, pady=5,padx=5)
+        label_importvideo.grid(row=1,column=0, sticky=N+W, pady=5,padx=5,rowspan=2)
         label_multivideoimport.grid(row=0, sticky=W)
         self.multivideofolderpath.grid(row=0, sticky=W)
         self.video_type.grid(row=1, sticky=W)
@@ -3304,7 +3461,7 @@ class loadprojectini:
         label_extractframes.grid(row=0,column=1,sticky=N+W,pady=5,padx=5)
         button_extractframes.grid(row=0,sticky=W)
 
-        label_importframefolder.grid(row=1,column=1,sticky=N+W,pady=5,padx=5)
+        label_importframefolder.grid(row=1,column=1,sticky=N+W,pady=5,padx=5,rowspan=2)
         self.frame_folder.grid(row=0,sticky=W)
         button_importframefolder.grid(row=1,sticky=W)
 
@@ -3314,6 +3471,11 @@ class loadprojectini:
 
         label_removeclassifier.grid(row=1,column=2,sticky=N+W,pady=5,padx=5)
         button_removeclassifier.grid(row=0)
+
+        label_archivecsv.grid(row=2,column=2,sticky=W,pady=5,padx=5)
+        archiveentrybox.grid(row=0)
+        button_archivecsv.grid(row=1,pady=10)
+
 
         label_setscale.grid(row=2,sticky=W,pady=5,padx=5)
         self.distanceinmm.grid(row=0,column=0,sticky=W)
@@ -3333,10 +3495,10 @@ class loadprojectini:
         button_labelaggression.grid(row=0,sticky=W)
         button_load_labelaggression.grid(row=1,sticky=W,pady=10)
 
-        label_pseudo.grid(row=6,sticky=W,pady=10)
-        pLabel_framedir.grid(row=0,sticky=W)
-        pLabel_dropdown.grid(row=1,sticky=W)
-        pLabel_button.grid(row=4,sticky=W)
+        # label_pseudo.grid(row=6,sticky=W,pady=10)
+        # pLabel_framedir.grid(row=0,sticky=W)
+        # plabelframe_threshold.grid(row=2,sticky=W)
+        # pLabel_button.grid(row=3,sticky=W)
 
         label_trainmachinemodel.grid(row=6,sticky=W)
         button_trainmachinesettings.grid(row=0,column=0,sticky=W,padx=5)
@@ -3403,7 +3565,9 @@ class loadprojectini:
         self.MaxScale.grid(row=1, sticky=W)
         self.hmMenu.grid(row=3,sticky=W)
         self.targetMenu.grid(row=4,sticky=W)
-        button_heatmap.grid(row=5, sticky=W)
+        self.bp1.grid(row=5,sticky=W)
+        lstimg.grid(row=6,sticky=W)
+        button_heatmap.grid(row=7, sticky=W)
         #threshold
         label_plotThreshold.grid(row=5, sticky=W)
         self.behaviorMenu.grid(row=0, sticky=W)
@@ -3417,6 +3581,49 @@ class loadprojectini:
         self.seconds.grid(row=0,sticky=W)
         self.cvTarget.grid(row=1,sticky=W)
         button_validate_classifier.grid(row=2,sticky=W)
+
+    def fileselected(self,val):
+        if val == 'csv':
+            # multicsv
+            label_multicsvimport = LabelFrame(self.label_import_csv, text='Import multiple csv files', pady=5, padx=5)
+            self.folder_csv = FolderSelect(label_multicsvimport, 'Folder selected:', title='Select Folder with .csv(s)')
+            button_import_csv = Button(label_multicsvimport, text='Import csv to project folder',
+                                       command=self.importdlctracking_multi, fg='navy')
+            # singlecsv
+            label_singlecsvimport = LabelFrame(self.label_import_csv, text='Import single csv files', pady=5, padx=5)
+            self.file_csv = FileSelect(label_singlecsvimport, 'File selected', title='Select a .csv file')
+            button_importsinglecsv = Button(label_singlecsvimport, text='Import single csv to project folder',
+                                            command=self.importdlctracking_single, fg='navy')
+            label_multicsvimport.grid(row=1, sticky=W)
+            self.folder_csv.grid(row=0, sticky=W)
+            button_import_csv.grid(row=1, sticky=W)
+            label_singlecsvimport.grid(row=2, sticky=W)
+            self.file_csv.grid(row=0, sticky=W)
+            button_importsinglecsv.grid(row=1, sticky=W)
+
+        else:
+            # import json into projectfolder
+            # multijson
+            label_multijsonimport = LabelFrame(self.label_import_csv, text='Import multiple json files', pady=5,
+                                               padx=5)
+            self.folder_json = FolderSelect(label_multijsonimport, 'Folder Select:',
+                                            title='Select Folder with .json(s)')
+            button_import_json = Button(label_multijsonimport, text='Import json to project folder',
+                                        command=lambda: json2csv_folder(self.projectconfigini,
+                                                                        self.folder_json.folder_path), fg='navy')
+            # singlejson
+            label_singlejsonimport = LabelFrame(self.label_import_csv, text='Import single json file', pady=5, padx=5)
+            self.file_csv = FileSelect(label_singlejsonimport, 'File Select', title='Select a .csv file')
+            button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder',
+                                             command=lambda: json2csv_file(self.projectconfigini,
+                                                                           self.file_csv.file_path), fg='navy')
+            # import json into projectfolder
+            label_multijsonimport.grid(row=1, sticky=W)
+            self.folder_json.grid(row=0, sticky=W)
+            button_import_json.grid(row=1, sticky=W)
+            label_singlejsonimport.grid(row=2, sticky=W)
+            self.file_csv.grid(row=0, sticky=W)
+            button_importsinglejson.grid(row=1, sticky=W)
 
     def addclassifier(self,newclassifier):
         config = ConfigParser()
@@ -3488,8 +3695,6 @@ class loadprojectini:
         with open(self.projectconfigini, 'w') as configfile:
             config.write(configfile)
 
-
-
     def tracknoofanimal(self,master,bplist):
         try:
             self.Bodyparts1.destroy()
@@ -3526,7 +3731,6 @@ class loadprojectini:
             videodir = os.path.join(os.path.dirname(self.projectconfigini), 'videos')
 
             roitableMenu(videodir, self.projectconfigini)
-
 
     def appendroisettings(self):
         apdroisettings = Toplevel()
@@ -3604,7 +3808,7 @@ class loadprojectini:
 
         #organize
         self.secondMenu.grid(row=1, sticky=W)
-        runButton.grid(row=3,padx=10,pady=10)
+        runButton.grid(row=30,padx=10,pady=10)
         if noofanimal.get()==1:
             animal1.grid(row=0,column=0,sticky=W)
             animalbody1.grid(row=0,column=0,sticky=W)
@@ -3618,6 +3822,29 @@ class loadprojectini:
             animalbody2.grid(row=0, column=0, sticky=W)
             animalbodymenu2.grid(row=0, column=1, sticky=W)
 
+        if appendornot == 'locationheatmap':
+            self.binsizepixels = Entry_Box(self.secondMenu,'Bin size (mm)','21')
+            self.scalemaxsec = Entry_Box(self.secondMenu,'# increments','21')
+            self.scaleincresec = Entry_Box(self.secondMenu,'Seconds per increment','21')
+            self.pal_var = StringVar()
+            paloptions = ['magma','jet','inferno','plasma','viridis','gnuplot2']
+            palette = OptionMenu(self.secondMenu,self.pal_var,*paloptions)
+            self.pal_var.set(paloptions[0])
+            self.lastimgvar =IntVar()
+            lastimg = Checkbutton(self.secondMenu,text='Save last image only (if unticked heatmap videos are created)',variable=self.lastimgvar)
+            newoptions = options + options2
+            animalbodymenu1 = OptionMenu(animal1, animalbody1var, *newoptions)
+            animalbodymenu1.grid(row=0, column=1, sticky=W)
+
+            #organize
+            self.binsizepixels.grid(row=1,sticky=W)
+            self.scalemaxsec.grid(row=2,sticky=W)
+            self.scaleincresec.grid(row=3,sticky=W)
+            palette.grid(row=4,sticky=W)
+            lastimg.grid(row=5,sticky=W)
+
+
+
     def run_analyze_roi(self,noofanimal,animal1bp,animal2bp,appendornot):
         configini = self.projectconfigini
         config = ConfigParser()
@@ -3629,6 +3856,15 @@ class loadprojectini:
             config.set('process movements', 'animal_2_bp', str(animal2bp))
             with open(configini, 'w') as configfile:
                 config.write(configfile)
+        elif appendornot == 'locationheatmap':
+            config.set('Heatmap location', 'body_part', str(animal1bp))
+            config.set('Heatmap location', 'Palette', str(self.pal_var.get()))
+            config.set('Heatmap location', 'Scale_increments_seconds', str(self.scaleincresec.entry_get))
+            config.set('Heatmap location', 'Scale_max_seconds', str(self.scalemaxsec.entry_get))
+            config.set('Heatmap location', 'bin_size_pixels', str(self.binsizepixels.entry_get))
+            with open(configini, 'w') as configfile:
+                config.write(configfile)
+
         else:
             config.set('ROI settings', 'no_of_animals', str(noofanimal))
             config.set('ROI settings', 'animal_1_bp', str(animal1bp))
@@ -3642,6 +3878,8 @@ class loadprojectini:
             roiAnalysis(configini,'outlier_corrected_movement_location')
         elif appendornot == 'processmovement':
             ROI_process_movement(configini)
+        elif appendornot == 'locationheatmap':
+            plotHeatMapLocation(configini,animal1bp,int(self.binsizepixels.entry_get),int(self.scalemaxsec.entry_get),int(self.scaleincresec.entry_get),self.pal_var.get(),self.lastimgvar.get())
         else:
             roiAnalysis(configini,'features_extracted')
 
@@ -3851,7 +4089,7 @@ class loadprojectini:
 
         #use loop to create checkbox?
         checkbox = [0]*7
-        titlebox =['events','sum duration (s)','mean duration (s)','median duration (s)','first occurance (s)','mean interval (s)','median interval (s)']
+        titlebox =['# bout events', 'total events duration (s)','mean bout duration (s)', 'median bout duration (s)', 'first occurance (s)', 'mean interval (s)', 'median interval (s)']
         for i in range(7):
             checkbox[i] = Checkbutton(dlmlabel,text=titlebox[i],variable=var[i])
             checkbox[i].grid(row=i,sticky=W)
@@ -4022,9 +4260,11 @@ class loadprojectini:
         config.set('Heatmap settings', 'Scale_increments_seconds', self.Inc.entry_get)
         config.set('Heatmap settings', 'Palette', self.hmMenu.getChoices())
         config.set('Heatmap settings', 'Target', self.targetMenu.getChoices())
+        config.set('Heatmap settings', 'body_part', self.bp1.getChoices())
         with open(configini, 'w') as configfile:
             config.write(configfile)
-        plotHeatMap(configini)
+        plotHeatMap(configini,self.bp1.getChoices(),int(self.BinSize.entry_get),int(self.MaxScale.entry_get),
+                    int(self.Inc.entry_get),self.hmMenu.getChoices(),self.intimgvar.get() , self.targetMenu.getChoices())
 
     def callback(self,url):
         webbrowser.open_new(url)

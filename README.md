@@ -6,10 +6,19 @@
 [![SimBA: listserv](https://img.shields.io/static/v1?label=SimBA&message=listserv&color=blue)](https://docs.google.com/forms/d/e/1FAIpQLSfjbjae0XqNcl7GYOxmqvRsCveG-cmf4p4hBNNJ8gu5vPLHng/viewform)
 [![DOI](https://zenodo.org/badge/206670333.svg)](https://zenodo.org/badge/latestdoi/206670333)
 
+
+**SimBAxTF**    [![Downloads](https://pepy.tech/badge/simba-uw-tf/month)](https://pepy.tech/project/simba-uw-tf/month)
+
+**SimBA w/o TF** [![Downloads](https://pepy.tech/badge/simba-uw-no-tf/month)](https://pepy.tech/project/simba-uw-no-tf/month)
+
+
 ![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
 
-## March-23-2020 COVID-19 Update
-As the scientific communty continues to respond to COVID-19, hopefully by closing their labs and instituting social distancing, we are committed to helping SimBA users (or just anyone interesting in ML and behavioral neuroscience) get up and running remotely. 
+## April-25-2020: SimBA pre-print manuscript release
+
+A pre-print SimBA manuscript on bioRxiv! The manuscript details the use of SimBA for generation of social predictive classifiers in rat and mouse resident-intruder protocols - please check it out using the link below. All data, pose-estimation models, and the final classifiers generated in the manuscript, can be accessed through our [OSF repository](https://osf.io/tmu6y/) and through the [Resource](https://github.com/sgoldenlab/simba#resource-) menu further down this page.
+
+**[Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
 
 Please join our [Gitter chat](https://gitter.im/SimBA-Resource/community) if you have any questions, or even if you would simply like to discuss potential applications for SimBA in your work.  Please come by, stay inside, wash your hands, and check on your lab mates reguarly!
 
@@ -77,7 +86,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 
 ### Scenario 3: [Updating a classifier with further annotated data](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario3.md)
 
-### Scenario 4: [Analyzing and adding new Experimental data to a previously started project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario3.md)
+### Scenario 4: [Analyzing and adding new Experimental data to a previously started project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4_new.md)
 
 
 ## Installation ⚙️
