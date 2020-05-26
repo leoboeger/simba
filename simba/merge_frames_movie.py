@@ -4,7 +4,8 @@ from scipy import ndimage
 import os
 import numpy as np
 from configparser import ConfigParser
-import math
+import glob
+import time
 
 def mergeframesPlot(configini,inputList):
     dirStatusList = inputList
@@ -61,11 +62,10 @@ def mergeframesPlot(configini,inputList):
 
         return int(outputImageHeight), int(outputImageWidh)
 
-
-
     if not os.path.exists(framesDir):
         os.makedirs(framesDir)
-    dirsList, toDelList = [], []
+
+    dirsList, fakePathList = [], []
     totalImages = sum(inputList)
     for status, foldername in zip(dirStatusList, dirFolders):
         if status == 1:
@@ -73,21 +73,63 @@ def mergeframesPlot(configini,inputList):
             foldersInFolder = [f.path for f in os.scandir(folderPath) if f.is_dir()]
             dirsList.append(foldersInFolder)
 
-    print(dirsList)
+    ### check that all folders contain an equal number of frames and they are not zero ###
+    toDelList = []
+    for folder in range(len(dirsList)):
+        imageCounts = []
+        try:
+            currFolders = [item[folder] for item in dirsList]
+        except IndexError:
+            currFolders = dirsList[folder]
+        for category in currFolders:
+            imageCounts.append(len(glob.glob(category + '/*.png')))
+        checkIfSame = all(x == imageCounts[0] for x in imageCounts)
+        if (checkIfSame == False) or (0 in imageCounts) or (None in imageCounts):
+            if os.path.basename(category) not in toDelList:
+                toDelList.append(os.path.basename(category))
+
+    # ### check that all folders contain each video
+    videoPathList = []
+    flat_list = [item for sublist in dirsList for item in sublist]
+    for item in flat_list:
+        videoPathList.append(os.path.basename(item))
+    uniqVideo = set(videoPathList)
+    for status, foldername in zip(dirStatusList, dirFolders):
+        if status == 1:
+            for basename in uniqVideo:
+                folderPath = os.path.join(frameDirIn, foldername, basename)
+                isdir = os.path.isdir(folderPath)
+                if isdir == False:
+                    toDelList.append(os.path.basename(folderPath))
+    if toDelList:
+        print('Videos ' + str(toDelList) + ' have missing frame folders, frame folders that are empty, or frame folder categories where the number of frames do not match. SimBA will not generate merged videos from these frames.')
+        time.sleep(6)
+    toDel2 = []
+    for list in dirsList:
+        for path in list:
+            currBase = os.path.basename(path)
+            for deleteWords in toDelList:
+                if deleteWords == currBase:
+                    toDel2.append(path)
+    for i in toDel2:
+        dirsList = [[ele for ele in sub if ele != i] for sub in dirsList]
+    for list in dirsList:
+        sorted(list, key=str.lower)
 
     for video in range(len(dirsList[0])):
         try:
             currentVidFolders = [item[video] for item in dirsList]
         except IndexError:
-            print('Error: all frame categories have not been created for the videos.')
+            print('Error: all the selected frame categories have not been created for the videos.')
         vidBaseName = os.path.basename(currentVidFolders[0])
+        print(vidBaseName)
         currVidInfo = vidLogsDf.loc[vidLogsDf['Video'] == str(vidBaseName)]
         try:
             fps = int(currVidInfo['fps'])
         except TypeError:
-            print('Error: make sure your image folders are represented in your video info log file.')
+            print('Error: make sure your videos you are merging are represented in your video info log file.')
             break
-        img = cv2.imread(os.path.join(currentVidFolders[video], '0.png'))
+        img = cv2.imread(os.path.join(currentVidFolders[0], '0.png'))
         imgHeight, imgWidth = img.shape[0], img.shape[1]
         y_offsets = [0, int((imgHeight / 2))]
         mergedFilePath = os.path.join(framesDir, vidBaseName + '.mp4')
@@ -141,24 +183,9 @@ def mergeframesPlot(configini,inputList):
             outputImage = np.uint8(outputImage)
             writer.write(outputImage)
             print('Image ' + str(images + 1) + '/' + str(imageLen) + '. Video ' + str(video + 1) + '/' + str(len(dirsList[0])))
-        print('All movies generated')
-        cv2.destroyAllWindows()
-        writer.release()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    print('All movies generated')
+    cv2.destroyAllWindows()
+    writer.release()
 
 
 
