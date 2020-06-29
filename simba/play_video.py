@@ -5,12 +5,14 @@ import signal
 import pandas as pd
 
 currentVideoPath = sys.stdin.readline()
+print(currentVideoPath)
 capture = cv2.VideoCapture(currentVideoPath)
 frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
 width = int(capture.get(3))
 height = int(capture.get(4))
 f = open(str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + '/labelling_info.txt', 'w')
 video_info_path = (str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2])) + '/logs/video_info.csv'
+print(video_info_path)
 vidinfDf = pd.read_csv(video_info_path)
 videoName = os.path.basename(currentVideoPath)
 videoName = videoName.split('.', 2)[0]

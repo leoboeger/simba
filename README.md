@@ -11,16 +11,24 @@
 
 **SimBA w/o TF** [![Downloads](https://pepy.tech/badge/simba-uw-no-tf/month)](https://pepy.tech/project/simba-uw-no-tf/month)
 
+**Pre-print: [Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
 
 ![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
 
-## April-25-2020: SimBA pre-print manuscript release
-
-A pre-print SimBA manuscript on bioRxiv! The manuscript details the use of SimBA for generation of social predictive classifiers in rat and mouse resident-intruder protocols - please check it out using the link below. All data, pose-estimation models, and the final classifiers generated in the manuscript, can be accessed through our [OSF repository](https://osf.io/tmu6y/) and through the [Resource](https://github.com/sgoldenlab/simba#resource-) menu further down this page.
-
-**[Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
+## June-12-2020: SimBA version 1.2 release
+### New Features
+- Multi-animal DLC support - [Documentation](/docs/Multi_animal_pose.md)
+- Multi-animal SLEAP support - [Documentation](/docs/Multi_animal_pose.md)
+- SimBA 'pseudo-labelling' module - [Documentation](/docs/pseudoLabel.md)
+- Easy install of SimBA via `pip` - [Documentation](/docs/installation.md)
+- Plenty of new quality-of-life features (e.g., time-bin analyzes / improved visualizations options) - [Documentation](/docs/Scenario1.md)
+- Many, many, many, many bug-fixes
 
 Please join our [Gitter chat](https://gitter.im/SimBA-Resource/community) if you have any questions, or even if you would simply like to discuss potential applications for SimBA in your work.  Please come by, stay inside, wash your hands, and check on your lab mates reguarly!
+
+## April-25-2020: SimBA pre-print manuscript release
+
+A pre-print SimBA manuscript on bioRxiv! The manuscript details the use of SimBA for generation of social predictive classifiers in rat and mouse resident-intruder protocols - please check it out using the link above. All data, pose-estimation models, and the final classifiers generated in the manuscript, can be accessed through our [OSF repository](https://osf.io/tmu6y/) and through the [Resource](https://github.com/sgoldenlab/simba#resource-) menu further down this page.
 
 ## March-05-2020: SimBA version 1.1 release
 ### New Features
@@ -34,6 +42,7 @@ Please join our [Gitter chat](https://gitter.im/SimBA-Resource/community) if you
 - Post-classification validation method for false-positives - [Documentation](/docs/classifier_validation.md#classifier-validation)
 - Many, many, many bug-fixes
 
+## What is SimBA?
 Several excellent computational frameworks exist that enable high-throughput and consistent tracking of freely moving unmarked animals. Here we introduce and distribute a plug-and play pipeline that enabled users to use these pose-estimation approaches in combination with behavioral annotatation and generatation of supervised machine-learning behavioral predictive classifiers. We have developed this pipeline for the analysis of complex social behaviors, but have included the flexibility for users to generate predictive classifiers across other behavioral modalities with minimal effort and no specialized computational background.  
 
 SimBA does not require computer science and programing experience, and SimBA is optimized for wide-ranging video acquisition parameters and quality. SimBA is written for Microsoft Windows. We may be able to provide support and advice for specific use instances, especially if it benefits multiple users and advances the scope of SimBA. Feel free to post issues and bugs here or contact us directly and we'll work on squashing them as they appear. We hope that users will contribute to the community!
@@ -45,9 +54,9 @@ SimBA does not require computer science and programing experience, and SimBA is 
 - Currently included behavioral classifiers have been validated in mice and rats
 - SimBA is written for Windows
 
-**SimBA currently does not support analysis of video recordings of multiple similarly colored animals. SimBA provides several validated classifer libraries using videos filmed from above at 90° angle with pose-estimation data from 8 body parts per animal. SimBA now accepts any user-defined pose-estimation annotation schemes with the inclusion of the [Flexible Annotation Module in v1.1](https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md)**. 
+**SimBA provides several validated classifer libraries using videos filmed from above at 90° angle with pose-estimation data from 8 body parts per animal; please see our [OSF repository](https://osf.io/tmu6y/) for access to all files. SimBA now accepts any user-defined pose-estimation annotation schemes with the inclusion of the [Flexible Annotation Module in v1.1](https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md). SimBA now supports maDLC and SLEAP for similar looking animals with the release of [maDLC/SLEAP module in v1.2](/docs/Multi_animal_pose.md).** 
 
-**Installation note:** SimBA can be installed either with TensorFlow compatability (for generating DeepLabCut and DeepPoseKit pose-estimation models), or without TensorFlow (for stand-alone use with classifiers and other functions). Please choose the appropriate branch for your needs, more details are found in the [Installation Documentation](https://github.com/sgoldenlab/simba/blob/master/README.md#installation-%EF%B8%8F).
+**Installation note:** SimBA can be installed either with TensorFlow compatability (for generating DeepLabCut, DeepPoseKit and SLEAP pose-estimation models), or without TensorFlow (for stand-alone use with classifiers and other functions). Please choose the appropriate branch for your needs, using pip install. More details are found in the [Installation Documentation](https://github.com/sgoldenlab/simba/blob/master/README.md#installation-%EF%B8%8F).
 
 **Listserv for release information:** If you would like to receive notification for new releases of SimBA, please **[fill out this form](https://forms.gle/R47RWN4stNSJBj9D9)** and you will be added to the listserv.
 
@@ -101,6 +110,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [SimBA generic tutorial](docs/tutorial.md) 📘
 - [SimBA behavioral annotation interface](docs/labelling_aggression_tutorial.md) 🏷️
 - [Using user-defined ROIs in SimBA](/docs/ROI_tutorial.md) 🗺️
+- [Using multi-animal pose (maDLC/SLEAP) in SimBA](/docs/Multi_animal_pose.md) ❌
 - [Recommended hardware](https://github.com/sgoldenlab/simba/blob/master/misc/system_requirements.md) 🖥️
 
 ## Resource 💾

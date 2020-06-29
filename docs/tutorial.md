@@ -41,7 +41,9 @@ In this step you create your main project folder with all the required sub-direc
 
 1. In the main SimBA window, click on `File` and and `Create a new project`. The following windows will pop up.
 
-![](/images/createproject.PNG "createproject")
+<p align="center">
+<img src="/images/createproject.PNG" width="60%">
+</p>
 
 2. Navigate to the `[ Generate project config ]` tab. Under **General Settings**, specify a `Project Path` which is the directory that will contain your main project folder.
 
@@ -55,9 +57,11 @@ In this step you create your main project folder with all the required sub-direc
   <img width="385" height="106" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG">
 </p>
 
-6. `Animal Settings` is the number of animals and body parts that that the pose estimation tracking data contains. The default for **SimBA** is 2 animals and 16 body parts ( `2 animals, 16bp`). There are a few other - ** yet not validaded** - options, accessible in the dropdown menu.
+6. `Type of Tracking` allows the user to choose multi-animal tracking or the classic tracking.
 
-7. Click on `Generate Project Config` to generate your project. The project folder will be located in the specified `Project Path`. 
+7. `Animal Settings` is the number of animals and body parts that that the pose estimation tracking data contains. The default for **SimBA** is 2 animals and 16 body parts ( `2 animals, 16bp`). There are a few other - ** yet not validaded** - options, accessible in the dropdown menu.
+
+8. Click on `Generate Project Config` to generate your project. The project folder will be located in the specified `Project Path`. 
 
 ### Step 2: Import videos into project folder
 In this step, you can choose to import either one or multiple videos. The imported videos are used for visualizing predictions and standardizing distances across videos by calculating metric distances from pixel distances. 
@@ -74,17 +78,46 @@ In this step, you can choose to import either one or multiple videos. The import
 1. Under the `Import single video` heading, click on `Browse File` to select your video.
 2. Click on `Import a video`.
 
-### Step 3: Import DLC Tracking Data
-In this step, you will import your pose-estimation tracking data from DeepLabCut in csv file format.
+### Step 3: Import Tracking Data
+In this step, you will import your pose-estimation tracking data.
 
 ![](/images/importcsv.PNG "importcsv")
 
-#### To import multiple DLC csv files
-1. Navigate to the `[ Import tracking data ]` tab. Under the `Import multiple csv files` heading, click on `Browse Folder` to select the folder that contains the csv files that you wish to import into your project.
-2. Click on `Import csv to project folder`. 
-#### To import a single csv file
-1. Under the `Import single csv files` heading, and click on `Browse File` to select the csv file containing your pose estimation data.
-2. Click on `Import single csv to project folder`.
+#### To import csv/json files
+1. Navigate to the `[ Import tracking data ]` tab. Under the `Import tracking data` click on the `File type` drop down menu.
+
+2. From the drop down menu, .csv files = `CSV (DLC/DeepPoseKit)`, and .json files = `JSON (BENTO)`.
+
+3. To import multiple files, choose the folder that contains the files by clicking `Browse Folder`, then click `Import csv to project folder`.
+
+4. To import a single file, choose the file by clicking `Browse File`, then click `Import single csv to project folder`.
+
+#### To import h5 files (multi-animal DLC)
+Please note that you can only import the h5 tracking data after you have imported the videos into the project folder.
+
+1. From the `File type` drop down menu, select `H5 (multi-animal DLC)`.
+
+2. Under ` Animal settings`, enter the number of animals in the videos in the `No of animals` entry box, and click `Confirm`.
+
+3. Enter the names for each of the animal in the video.
+
+4. `Tracking type` is the type of tracking from DeepLabCut multi animal tracking.
+
+5. Select the folder that contains all the h5 files by clicking `Browse Folder`.
+
+6. Click `Import h5` to start importing.
+
+#### To import slp files (SLEAP)
+
+1. From the `File type` drop down menu, select `SLP (SLEAP)`.
+
+2. Under ` Animal settings`, enter the number of animals in the videos in the `No of animals` entry box, and click `Confirm`.
+
+3. Enter the names for each of the animal in the video.
+
+4. Select the folder that contains all the slp files by clicking `Browse Folder`.
+
+5. Click on `Import .slp`.
 
 ### Step 4: Extract frames into project folder
 This step will extract all the frames from every video that are imported into the project following **Step 2**. The frames are used for behavioral labeling when creating classifiers, and for visualizing the classification results. Once the step is completed, close the `Project Configuration` window.

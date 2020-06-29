@@ -2,18 +2,19 @@
 **!!! IMPORTANT !!!**
 You can choose to install SimBA as a standalone package or install SimBA with [TensorFlow](https://github.com/tensorflow/tensorflow) integration.  
 
-1) If you would like to be able to call [DeepLabCut](https://github.com/AlexEMG/DeepLabCut) or [DeepPoseKit](https://github.com/jgraving/DeepPoseKit) commands via the SimBA interface (whuch requires a local GPU), please install SimBAxTF from the **master** branch.  Please see full instructions below.
+1) If you would like to be able to call [DeepLabCut](https://github.com/AlexEMG/DeepLabCut) or [DeepPoseKit](https://github.com/jgraving/DeepPoseKit) commands via the SimBA interface (whuch requires a local GPU), please install SimBAxTF from the **master** branch. Please see the SimBA tutorials on [DeepLabCut](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md) or [DeepPoseKit](https://github.com/sgoldenlab/simba/blob/master/docs/DeepPoseKit_in_SimBA.md) for information on what it means to run DeepLabCut and DeepPoseKit within the SimBA GUI. **See full installation instructions below.**
 
-2) If you do **not** want to use TensorFlow through SimBA on your local machine, and instead have DeepLabCut/DeepPoseKit installed elsewhere, please install SimBA from the **SimBA_no_TF** branch. This does not require a GPU, or local installations of DeepLabCut or DeepPoseKit. Please see full instructions below. This version of SimBA includes **all functionalities** of SimBAxTF, except for the ability to generate pose-estimation models through the SimBA GUI. **Pose-estmation model results can still be imported and analysed**.
+2) If you do **not** want to use TensorFlow through SimBA on your local machine, and instead have DeepLabCut/DeepPoseKit/SLEAP installed elsewhere, please install SimBA from the **SimBA_no_TF** branch. This does not require a GPU, or local installations of DeepLabCut, DeepPoseKit, or SLEAP. Please see full instructions below. This non-TF version of SimBA includes **all functionalities** of SimBAxTF, except for the ability to generate pose-estimation models through the SimBA GUI. **Pose-estmation model results can still be imported and analysed**.
 
 # Requirements
 1. [Python 3.6](https://www.python.org/downloads/release/python-360/)  **<-- VALIDATED WITH 3.6.0**
 2. [Git](https://git-scm.com/downloads) 
 3. [FFmpeg](https://m.wikihow.com/Install-FFmpeg-on-Windows)
+4. Microsoft Windows operating system
 
-# Installing SimBA Option 1
+# Installing SimBA Option 1 (RECOMMENDED!)
 
-### Install SimBAxTF with integrated TensorFlow (use this installation method when running DeepLabCut or DeepPoseKit locally using a GPU)
+### Install SimBAxTF with integrated TensorFlow (use this installation method when running DeepLabCut, DeepPoseKit, or SLEAP locally using a GPU)
 Open bash or command prompt and run the following commands on current working directory
 
 ```
@@ -37,7 +38,7 @@ simba
 ```
 3. Hit `Enter`.
 
->*Note:* If you installed simba on a virtual environment (anaconda), after installation, run `conda install shapely` for simba to work.
+>*Note:* If you installed SimBA on a virtual environment (anaconda), after installation, you may have to run run `conda install shapely` for SimBA to work.
 
 
 # Installing SimBA Option 2

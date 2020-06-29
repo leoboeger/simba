@@ -87,6 +87,7 @@ def mergeframesPlot(configini,inputList):
         if (checkIfSame == False) or (0 in imageCounts) or (None in imageCounts):
             if os.path.basename(category) not in toDelList:
                 toDelList.append(os.path.basename(category))
+                print(os.path.basename(category) + str(' has zero frames or an unequal number of frames in one or several frame categories.'))
 
     # ### check that all folders contain each video
     videoPathList = []
@@ -101,6 +102,7 @@ def mergeframesPlot(configini,inputList):
                 isdir = os.path.isdir(folderPath)
                 if isdir == False:
                     toDelList.append(os.path.basename(folderPath))
+                    print(os.path.basename(folderPath) + str(' do not have frames for each user-specified frame category'))
     if toDelList:
         print('Videos ' + str(toDelList) + ' have missing frame folders, frame folders that are empty, or frame folder categories where the number of frames do not match. SimBA will not generate merged videos from these frames.')
         time.sleep(6)
