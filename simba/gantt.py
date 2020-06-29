@@ -16,13 +16,10 @@ def ganntplot_config(configini):
     no_targets = config.getint('SML settings', 'No_targets')
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
-    boutEnd = 0
-    boutEnd_list = [0]
-    boutStart_list, target_names = [], []
+    boutStart_list, target_names, VideoCounter = [], [], 0
     colours = ['red', 'green', 'pink', 'orange', 'blue', 'purple', 'lavender', 'grey', 'sienna', 'tomato', 'azure',
                'crimson', 'aqua', 'plum', 'teal', 'maroon', 'lime', 'coral']
     colourTupleX = list(np.arange(3.5, 203.5, 5))
-    VideoCounter = 0
 
     ########### FIND CSV FILES ###########
     filesFound = glob.glob(csv_dir_in + "/*.csv")
@@ -36,7 +33,6 @@ def ganntplot_config(configini):
     colours = colours[:len(target_names)]
 
     for currentFile in filesFound:
-        boutsDf = pd.DataFrame(columns=['Event', 'Start_frame', 'End_frame'])
         CurrentVideoName = os.path.basename(currentFile.replace('.csv', ''))
         print('Analyzing file ' + str(CurrentVideoName) + '...')
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName)]
