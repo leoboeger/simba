@@ -5143,7 +5143,7 @@ class SplashScreen:
 
     def Splash(self):
         scriptdir = os.path.dirname(__file__)
-        self.image = Image.open(os.path.join(scriptdir,"TheGoldenLab.png"))
+        self.image = PIL.Image.open(os.path.join(scriptdir,"TheGoldenLab.png"))
         self.imgSplash = ImageTk.PhotoImage(self.image)
 
     def Window(self):
